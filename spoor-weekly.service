@@ -1,0 +1,10 @@
+[Unit]
+Description=spoor weekly DMARC summary (push to ntfy)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=spoor
+Group=spoor
+ExecStart=/usr/local/bin/spoor-weekly.py

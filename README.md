@@ -104,3 +104,21 @@ attribute reports to a specific posting.
 Limits: organization-level (no individual recipients); only from receivers that
 honor `rua`; the `source_ip` is the last hop (e.g. a mailing list's relay), not
 your original path.
+
+## Weekly summary via systemd timer → ntfy
+
+`spoor-weekly.py` aggregates everything received since the last run (state file
+`/var/lib/spoor/last-run`) and pushes a short summary — reporting orgs,
+forwarding names (`envelope_from`, e.g. mailing-list relays) and counts — to an
+[ntfy](https://ntfy.sh) topic. `spoor-weekly.timer` runs it `OnCalendar=Mon 09:00`
+(`Persistent=true`). State only advances on a successful post, so a failed run
+widens the next window instead of dropping data.
+
+```
+# /etc/spoor.conf
+{"dsn": "host=127.0.0.1 dbname=spoor user=spoor password=...",
+ "ntfy_url": "http://ntfy.example/<topic>"}
+```
+
+The topic is created on first publish; subscribe to the same topic in the ntfy
+app. Run it by hand with `systemctl start spoor-weekly.service`.
